@@ -59,7 +59,9 @@ namespace g80 {
             decimal(const T i, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{static_cast<int64_t>(i * scale_mul_)} {}
+                data_{static_cast<int64_t>(i * scale_mul_ + (i >= 0 ? 0.5 : -0.5))} {}
+
+            decimal() : decimal{0, 2} {}
 
             // Copy Constructor for decimal
             template<typename D> requires std::is_same<D, decimal>::value
@@ -70,11 +72,13 @@ namespace g80 {
 
             ~decimal() = default;
 
-            // // Assignment operator for integral and floating types
-            // template<typename T> requires std::is_integral<I>::value || std::is_floating_point<T>::value
-            // auto operator=(const T t) -> decimal & {
-            //     data_ = static_cast<int64_t>(t * scale_mul_);
-            // }
+            // Assignment operator for integral and floating types
+            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            auto operator=(const T t) -> decimal & {
+                // std::cout << "hey: " << static_cast<int64_t>(t * scale_mul_ + 0.5) << "\n";
+                data_ = static_cast<int64_t>(t * scale_mul_ + (i >= 0 ? 0.5 : -0.5));
+                return *this;
+            }
 
             // // Assignment operator for decimal
             // template<typename F> requires std::is_floating_point<I>::value
@@ -95,7 +99,7 @@ namespace g80 {
 
 
 
-            // auto get_as_int() -> int64_t {return data_;}
+            auto get_as_int() -> int64_t {return data_;}
             auto get_as_ldouble() -> long double {
                 return static_cast<long double>(1.0 * data_ / scale_mul_);
             }
