@@ -54,33 +54,32 @@ namespace g80 {
 
         public:
 
-            // Constructor for integral types
+            // Regular Constructor for integral types
             template<typename I> requires std::is_integral<I>::value
-            decimal(const I i, const int8_t s = 2) : 
+            decimal(const I i, const int8_t s = 0) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
                 data_{i * scale_mul_} {}
 
-            // Constructor for floating-points
+            // Regular Constructor for floating-points
             template<typename F> requires std::is_floating_point<F>::value
-            decimal(const F f, const int8_t s = 4) : 
+            decimal(const F f, const int8_t s = 6) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
                 data_{static_cast<int64_t>(f * scale_mul_)} {}
 
-            // Constructor for decimal
+            // Copy Constructor for decimal
             template<typename D> requires std::is_same<D, decimal>::value
             decimal(const D &d, const int8_t s) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(s)}, 
                 data_{d.data_on_scale(s)} {
-                std::cout << "hello\n"    ;
             }
 
-
-            // template<typename D> requires std::is_same<D, decimal>::value 
-            // decimal(const decimal &d, const int8_t scale) : data_{d.data_on_scale(scale)}, scale_{scale}, scale_mul_{get_scale_mul(scale_)} {}
-
+            // Copy Constructor for decimal
+            template<typename D> requires std::is_same<D, decimal>::value
+            decimal(const D &d) : decimal{d, d.scale_} {
+            }
 
 
 //            decimal(const decimal &d, const int8_t scale) : data_{d.data_on_scale(scale)}, scale_{d.scale_}, scale_mul_{d.scale_mul_} {}
@@ -89,32 +88,32 @@ namespace g80 {
 
             ~decimal() = default;
             
-            auto operator=(const decimal &r) -> decimal & {data_ = {r.data_}, scale_ = {r.scale_}, scale_mul_ = {r.scale_mul_}; return *this;}
-            auto operator=(decimal &&r) -> decimal & {data_ = {r.data_}, scale_ = {r.scale_}, scale_mul_ = {r.scale_mul_}; return *this;}
-            template<typename T> requires std::is_integral<T>::value auto operator=(const T r) -> decimal & {data_ = r; return *this;}
+            // auto operator=(const decimal &r) -> decimal & {data_ = {r.data_}, scale_ = {r.scale_}, scale_mul_ = {r.scale_mul_}; return *this;}
+            // auto operator=(decimal &&r) -> decimal & {data_ = {r.data_}, scale_ = {r.scale_}, scale_mul_ = {r.scale_mul_}; return *this;}
+            // template<typename T> requires std::is_integral<T>::value auto operator=(const T r) -> decimal & {data_ = r; return *this;}
             
-            template<typename T> requires std::is_floating_point<T>::value auto operator=(const T r) -> decimal & {
-                std::cout << "here\n";
-                data_ = static_cast<int64_t>(r * scale_mul_);
-                return *this;
-            }
+            // template<typename T> requires std::is_floating_point<T>::value auto operator=(const T r) -> decimal & {
+            //     std::cout << "here\n";
+            //     data_ = static_cast<int64_t>(r * scale_mul_);
+            //     return *this;
+            // }
 
 
 
-            auto get_as_int() -> int64_t {return data_;}
+            // auto get_as_int() -> int64_t {return data_;}
             auto get_as_ldouble() -> long double {
                 return static_cast<long double>(1.0 * data_ / scale_mul_);
             }
 
-            auto operator+=(decimal r) -> decimal & {
-                auto gs = std::max(scale_, r.scale_); 
+            // auto operator+=(decimal r) -> decimal & {
+            //     auto gs = std::max(scale_, r.scale_); 
 
-                // std::cout << "gs: " << (int) gs << "\n";
-                // std::cout << "this->data_on_scale(gs): " << this->data_on_scale(gs) << "\n";
-                // std::cout << "r->data_on_scale(gs): " << r.data_on_scale(gs) << "\n";
-                data_ = this->data_on_scale(gs) + r.data_on_scale(gs); 
-                return *this;
-            }
+            //     // std::cout << "gs: " << (int) gs << "\n";
+            //     // std::cout << "this->data_on_scale(gs): " << this->data_on_scale(gs) << "\n";
+            //     // std::cout << "r->data_on_scale(gs): " << r.data_on_scale(gs) << "\n";
+            //     data_ = this->data_on_scale(gs) + r.data_on_scale(gs); 
+            //     return *this;
+            // }
         };
     }
 }
