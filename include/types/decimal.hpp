@@ -95,7 +95,8 @@ namespace g80 {
             }
 
 
-            auto get_as_int() -> int64_t {return data_;}
+            auto get_whole() -> int64_t {return data_ / scale_mul_;}
+            auto get_part() -> int64_t {return data_ % scale_mul_;}
             auto get_as_ldouble() -> long double {
                 return static_cast<long double>(1.0 * data_ / scale_mul_);
             }
