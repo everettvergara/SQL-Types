@@ -88,6 +88,30 @@ namespace g80 {
                 return *this;
             }
 
+            // operator += for decimal
+            auto operator+=(const decimal &d) -> decimal & {
+                auto gs = scale_ >= d.scale_ ? scale_ : d.scale_;
+                scale_ = gs;
+                scale_mul_ = get_scale_mul(gs);
+                data_ = this->data_on_scale(gs) + d.data_on_scale(gs);
+                return *this;
+            }
+
+            // operator += for integral and fp
+            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            auto operator+=(const T t) -> decimal & {
+                data_ = data_ + static_cast<int64_t>(t * scale_mul_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                return *this;
+            }
+
+            // operator += for string
+            auto operator+=(const std::string &n) -> decimal & {
+                data_ = data_ + static_cast<int64_t>((std::stold(n) * scale_mul_ + (std::stold(n) >= 0 ? 0.5 : -0.5)));
+                return *this;
+            }
+
+
+            // Helpers
             auto get_whole() const -> int64_t {
                 return data_ / scale_mul_;
             }
