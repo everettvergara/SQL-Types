@@ -59,7 +59,8 @@ namespace g80 {
             decimal(const T i, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{static_cast<int64_t>(i * scale_mul_ + (i >= 0 ? 0.5 : -0.5))} {}
+                data_{static_cast<int64_t>(i * scale_mul_ + 
+                        std::is_integral<T>::value ? 0 : (i >= 0 ? 0.5 : -0.5))} {}
 
             decimal() : decimal{0, 2} {}
 
@@ -75,8 +76,8 @@ namespace g80 {
             // Assignment operator for integral and floating types
             template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
             auto operator=(const T t) -> decimal & {
-                // std::cout << "hey: " << static_cast<int64_t>(t * scale_mul_ + 0.5) << "\n";
-                data_ = static_cast<int64_t>(t * scale_mul_ + (i >= 0 ? 0.5 : -0.5));
+                data_ = static_cast<int64_t>(t * scale_mul_ + 
+                        std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5));
                 return *this;
             }
 
