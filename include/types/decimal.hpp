@@ -56,17 +56,26 @@ namespace g80 {
 
             // Constructor for integral types
             template<typename I> requires std::is_integral<I>::value
-            decimal(const I i, const int8_t s) : 
+            decimal(const I i, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{i * scale_mul_}  {}
+                data_{i * scale_mul_} {}
 
             // Constructor for floating-points
             template<typename F> requires std::is_floating_point<F>::value
-            decimal(const F f, const int8_t s) : 
+            decimal(const F f, const int8_t s = 4) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{static_cast<int64_t>(f * scale_mul_)}  {}
+                data_{static_cast<int64_t>(f * scale_mul_)} {}
+
+            // Constructor for decimal
+            template<typename D> requires std::is_same<D, decimal>::value
+            decimal(D &d, const int8_t s) : 
+                scale_{s}, 
+                scale_mul_{get_scale_mul(s)}, 
+                data_{d.data_on_scale(s)} {
+                std::cout << "hello\n"    ;
+            }
 
 
             // template<typename D> requires std::is_same<D, decimal>::value 
