@@ -73,7 +73,7 @@ namespace g80 {
 
             ~decimal() = default;
 
-            // Assignment operator for integral and floating types
+            // Copy Assignment operator for integral and floating types
             template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
             auto operator=(const T t) -> decimal & {
                 data_ = static_cast<int64_t>(t * scale_mul_ + 
@@ -81,11 +81,14 @@ namespace g80 {
                 return *this;
             }
 
-            // // Assignment operator for decimal
-            // template<typename F> requires std::is_floating_point<I>::value
-            // auto operator=(const F f) -> decimal & {
-            //     data_ = i * scale_mul_;
-            // }
+            // Copy Assignment operator for decimal
+            template<typename D> requires std::is_same<D, decimal>::value
+            auto operator=(const D &d) -> decimal & {
+                scale_ = d.scale_;
+                scale_mul_ = d.scale_mul_;
+                data_ = d.data_;
+                return *this;
+            }
 
             
             // auto operator=(const decimal &r) -> decimal & {data_ = {r.data_}, scale_ = {r.scale_}, scale_mul_ = {r.scale_mul_}; return *this;}
