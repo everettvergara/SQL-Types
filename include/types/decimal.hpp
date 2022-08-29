@@ -39,7 +39,7 @@ namespace g80 {
                 return m;
             }
 
-            inline auto data_on_scale(int8_t s) -> int64_t {
+            inline auto data_on_scale(int8_t s) const -> int64_t {
                 int8_t ds = s - scale_;
                 if(ds == 0) return data_;
                 auto mul = decimal::get_scale_mul(ds < 0 ? -ds : ds);
@@ -70,7 +70,7 @@ namespace g80 {
 
             // Constructor for decimal
             template<typename D> requires std::is_same<D, decimal>::value
-            decimal(D &d, const int8_t s) : 
+            decimal(const D &d, const int8_t s) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(s)}, 
                 data_{d.data_on_scale(s)} {
