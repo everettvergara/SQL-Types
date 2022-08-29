@@ -24,8 +24,6 @@ namespace g80 {
          * 
          */
 
-
-
         class decimal {
 
         private:
@@ -39,17 +37,6 @@ namespace g80 {
                 return m;
             }
 
-            inline auto data_on_scale(int8_t s) const -> int64_t {
-                int8_t ds = s - scale_;
-                if(ds == 0) return data_;
-                auto mul = decimal::get_scale_mul(ds < 0 ? -ds : ds);
-                if(ds > 0) return data_ * mul;
-                return data_ / mul;
-            }
-
-            auto rescale(int8_t s) -> int64_t {
-                return data_ = this->data_on_scale(s);
-            }
 
 
         public:
@@ -67,6 +54,13 @@ namespace g80 {
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
                 data_{static_cast<int64_t>(i * scale_mul_ + (std::is_integral<T>::value ? 0 : (i >= 0 ? 0.5 : -0.5)))} {
+            }
+
+            // Regular Constructor for integral/fp types in string format
+            decimal(const std::string &n, const int8_t s = 2) : 
+                scale_{s}, 
+                scale_mul_{get_scale_mul(scale_)}, 
+                data_{static_cast<int64_t>(std::stold(n) * scale_mul_ + (std::stold(n) >= 0 ? 0.5 : -0.5))} {
             }
 
             // Copy Constructor for decimal
@@ -94,12 +88,29 @@ namespace g80 {
                 return *this;
             }
 
-            auto get_whole() -> int64_t {return data_ / scale_mul_;}
-            auto get_part() -> int64_t {return data_ % scale_mul_;}
-            auto get_as_ldouble() -> long double {
+            auto get_whole() const -> int64_t {
+                return data_ / scale_mul_;
+            }
+            
+            auto get_part() const -> int64_t {
+                return data_ % scale_mul_;
+            }
+
+            auto get_as_ldouble() const -> long double {
                 return static_cast<long double>(1.0 * data_ / scale_mul_);
             }
 
+            inline auto data_on_scale(int8_t s) const -> int64_t {
+                int8_t ds = s - scale_;
+                if(ds == 0) return data_;
+                auto mul = decimal::get_scale_mul(ds < 0 ? -ds : ds);
+                if(ds > 0) return data_ * mul;
+                return data_ / mul;
+            }
+
+            auto rescale(int8_t s) -> int64_t {
+                return data_ = this->data_on_scale(s);
+            }
         };
     }
 }
