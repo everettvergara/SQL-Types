@@ -20,7 +20,7 @@ namespace g80 {
                 return m;
             }
 
-            auto scaled_str_to_ld(const std::string &n) const -> long double {
+            auto scaled_str_to_ld(const std::wstring &n) const -> long double {
                 auto ld = std::stold(n) * scale_mul_;
                 ld += ld >= 0 ? 0.50 : -0.5;
                 return ld;
@@ -35,16 +35,16 @@ namespace g80 {
                 data_{0} {
             }
 
-            // Regular Constructor for integral types
+            // Regular Constructor for integral and floating point types
             template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
-            decimal(const T i, const int8_t s = 2) : 
+            decimal(const T t, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{static_cast<int64_t>(i * scale_mul_ + (std::is_integral_v<T> ? 0 : (i >= 0 ? 0.5 : -0.5)))} {
+                data_{static_cast<int64_t>(t * scale_mul_ + (std::is_integral_v<T> ? 0 : (t >= 0 ? 0.5 : -0.5)))} {
             }
 
             // Regular Constructor for integral/fp types in string format
-            decimal(const std::string &n, const int8_t s = 2) : 
+            decimal(const std::wstring &n, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
                 data_{static_cast<int64_t>(scaled_str_to_ld(n))} {
@@ -76,7 +76,7 @@ namespace g80 {
             }
 
             // Copy assignment for decimal
-            auto operator=(const std::string &n) -> decimal & {
+            auto operator=(const std::wstring &n) -> decimal & {
                 data_ = {static_cast<int64_t>(scaled_str_to_ld(n))};
                 return *this;
             }
@@ -98,7 +98,7 @@ namespace g80 {
             }
 
             // operator += for string
-            auto operator+=(const std::string &n) -> decimal & {
+            auto operator+=(const std::wstring &n) -> decimal & {
                 data_ += static_cast<int64_t>(scaled_str_to_ld(n));
                 return *this;
             }
@@ -120,7 +120,7 @@ namespace g80 {
             }
 
             // operator -= for string
-            auto operator-=(const std::string &n) -> decimal & {
+            auto operator-=(const std::wstring &n) -> decimal & {
                 data_ -= static_cast<int64_t>(scaled_str_to_ld(n));
                 return *this;
             }
@@ -143,7 +143,7 @@ namespace g80 {
             }
 
             // operator *= for string
-            auto operator*=(const std::string &n) -> decimal & {
+            auto operator*=(const std::wstring &n) -> decimal & {
                 auto ld = std::stold(n);
                 data_ = static_cast<int64_t>(ld * data_ + (ld >= 0 ? 0.5 : -0.5));
                 return *this;
@@ -167,7 +167,7 @@ namespace g80 {
             }
 
             // operator /= for string
-            auto operator/=(const std::string &n) -> decimal & {
+            auto operator/=(const std::wstring &n) -> decimal & {
                 auto ld = std::stold(n);
                 data_ = static_cast<int64_t>(data_ / ld + (ld >= 0 ? 0.5 : -0.5));
                 return *this;

@@ -7,7 +7,7 @@ auto main() -> int {
 
 
     decimal d1{0, 4};
-    
+    // d1 = L"123.456";
     std::cout << "Input number: ";
     std::cin >> d1;
 
@@ -17,7 +17,7 @@ auto main() -> int {
     return 0;
 
     decimal def{6.0, 4}, def2{2.0, 5};
-    decimal constr_from_int1{"245.56", 2};
+    decimal constr_from_int1{L"245.56", 2};
     decimal constr_from_int2{123};
     decimal constr_from_fp1{123.456f, 2};
     decimal constr_from_fp2{123.456f};
