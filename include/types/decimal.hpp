@@ -7,23 +7,6 @@
 namespace g80 {
     namespace odbc {
 
-
-        /**
-         * 
-         *      a: 250
-         *      b: 15 
-         * 
-         *      +
-         * 
-         *      max_allowance: 255 - a: 0
-         * 
-         *      if b <= max_allowance, co = 0
-         *      else co = max - b
-         * 
-         *      
-         * 
-         */
-
         class decimal {
 
         private:
@@ -167,8 +150,7 @@ namespace g80 {
                 return *this;
             }
 
-
-            // operator *= for decimal
+            // operator /= for decimal
             auto operator/=(const decimal &d) -> decimal & {
                 auto gs = scale_ >= d.scale_ ? scale_ : d.scale_;
                 auto gm = scale_mul_ >= d.scale_mul_ ? scale_mul_ : d.scale_mul_;
@@ -178,21 +160,19 @@ namespace g80 {
                 return *this;
             }
 
-            // operator *= for integral and fp
+            // operator /= for integral and fp
             template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
-            auto operator*=(const T t) -> decimal & {
+            auto operator/=(const T t) -> decimal & {
                 data_ = static_cast<int64_t>(data_ / t + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
-            // operator *= for string
-            auto operator*=(const std::string &n) -> decimal & {
-                //std::cout << "stold: " << static_cast<int64_t>(std::stold(n)) << " _ " << std::stold(n) << " x " << data_ << "\n";
+            // operator /= for string
+            auto operator/=(const std::string &n) -> decimal & {
                 auto ld = std::stold(n);
                 data_ = static_cast<int64_t>(data_ / ld + (ld >= 0 ? 0.5 : -0.5));
                 return *this;
             }
-
 
             // Helpers
             auto get_data() const -> int64_t {
@@ -231,5 +211,11 @@ namespace g80 {
                 return data_ = this->data_on_scale(s);
             }
         };
+
+        template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_class_v<decimal>
+        auto operator+(decimal l, const T &r) -> decimal {
+            l += r;
+            return l;
+        }
     }
 }
