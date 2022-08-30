@@ -168,6 +168,32 @@ namespace g80 {
             }
 
 
+            // operator *= for decimal
+            auto operator/=(const decimal &d) -> decimal & {
+                auto gs = scale_ >= d.scale_ ? scale_ : d.scale_;
+                auto gm = scale_mul_ >= d.scale_mul_ ? scale_mul_ : d.scale_mul_;
+                data_ = this->data_on_scale(gs) / d.data_on_scale(gs) * gm;
+                scale_ = gs;
+                scale_mul_ = gm;
+                return *this;
+            }
+
+            // operator *= for integral and fp
+            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            auto operator*=(const T t) -> decimal & {
+                data_ = static_cast<int64_t>(data_ / t + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                return *this;
+            }
+
+            // operator *= for string
+            auto operator*=(const std::string &n) -> decimal & {
+                //std::cout << "stold: " << static_cast<int64_t>(std::stold(n)) << " _ " << std::stold(n) << " x " << data_ << "\n";
+                auto ld = std::stold(n);
+                data_ = static_cast<int64_t>(data_ / ld + (ld >= 0 ? 0.5 : -0.5));
+                return *this;
+            }
+
+
             // Helpers
             auto get_data() const -> int64_t {
                 return data_;
