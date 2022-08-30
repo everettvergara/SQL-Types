@@ -36,11 +36,11 @@ namespace g80 {
             }
 
             // Regular Constructor for integral types
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
             decimal(const T i, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{static_cast<int64_t>(i * scale_mul_ + (std::is_integral<T>::value ? 0 : (i >= 0 ? 0.5 : -0.5)))} {
+                data_{static_cast<int64_t>(i * scale_mul_ + (std::is_integral_v<T> ? 0 : (i >= 0 ? 0.5 : -0.5)))} {
             }
 
             // Regular Constructor for integral/fp types in string format
@@ -61,9 +61,9 @@ namespace g80 {
             ~decimal() = default;
 
             // Copy Assignment for integral and floating types
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
             auto operator=(const T t) -> decimal & {
-                data_ = static_cast<int64_t>(t * scale_mul_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                data_ = static_cast<int64_t>(t * scale_mul_ + (std::is_integral_v<T> ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
@@ -84,16 +84,16 @@ namespace g80 {
             // operator += for decimal
             auto operator+=(const decimal &d) -> decimal & {
                 auto gs = scale_ >= d.scale_ ? scale_ : d.scale_;
+                data_ = this->data_on_scale(gs) + d.data_on_scale(gs);
                 scale_ = gs;
                 scale_mul_ = get_scale_mul(gs);
-                data_ = this->data_on_scale(gs) + d.data_on_scale(gs);
                 return *this;
             }
 
             // operator += for integral and fp
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
             auto operator+=(const T t) -> decimal & {
-                data_ += static_cast<int64_t>(t * scale_mul_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                data_ += static_cast<int64_t>(t * scale_mul_ + (std::is_integral_v<T> ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
@@ -106,16 +106,16 @@ namespace g80 {
             // operator -= for decimal
             auto operator-=(const decimal &d) -> decimal & {
                 auto gs = scale_ >= d.scale_ ? scale_ : d.scale_;
+                data_ = this->data_on_scale(gs) - d.data_on_scale(gs);
                 scale_ = gs;
                 scale_mul_ = get_scale_mul(gs);
-                data_ = this->data_on_scale(gs) - d.data_on_scale(gs);
                 return *this;
             }
 
             // operator -= for integral and fp
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
             auto operator-=(const T t) -> decimal & {
-                data_ -= static_cast<int64_t>(t * scale_mul_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                data_ -= static_cast<int64_t>(t * scale_mul_ + (std::is_integral_v<T> ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
@@ -136,15 +136,14 @@ namespace g80 {
             }
 
             // operator *= for integral and fp
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
             auto operator*=(const T t) -> decimal & {
-                data_ = static_cast<int64_t>(t * data_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                data_ = static_cast<int64_t>(t * data_ + (std::is_integral_v<T> ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
             // operator *= for string
             auto operator*=(const std::string &n) -> decimal & {
-                //std::cout << "stold: " << static_cast<int64_t>(std::stold(n)) << " _ " << std::stold(n) << " x " << data_ << "\n";
                 auto ld = std::stold(n);
                 data_ = static_cast<int64_t>(ld * data_ + (ld >= 0 ? 0.5 : -0.5));
                 return *this;
@@ -161,9 +160,9 @@ namespace g80 {
             }
 
             // operator /= for integral and fp
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
+            template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T>
             auto operator/=(const T t) -> decimal & {
-                data_ = static_cast<int64_t>(data_ / t + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                data_ = static_cast<int64_t>(data_ / t + (std::is_integral_v<T> ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
@@ -215,6 +214,24 @@ namespace g80 {
         template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_class_v<decimal>
         auto operator+(decimal l, const T &r) -> decimal {
             l += r;
+            return l;
+        }
+
+        template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_class_v<decimal>
+        auto operator-(decimal l, const T &r) -> decimal {
+            l -= r;
+            return l;
+        }
+
+        template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_class_v<decimal>
+        auto operator*(decimal l, const T &r) -> decimal {
+            l *= r;
+            return l;
+        }
+
+        template<typename T> requires std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_class_v<decimal>
+        auto operator/(decimal l, const T &r) -> decimal {
+            l /= r;
             return l;
         }
     }

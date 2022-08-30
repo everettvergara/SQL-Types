@@ -5,6 +5,14 @@
 using namespace g80::odbc;
 auto main() -> int {
 
+
+    decimal d1{0, 4};
+    
+    auto d2 = 10.0f + d1;
+    std::cout << d2.get_as_ldouble() << "\n";
+
+    return 0;
+
     decimal def{6.0, 4}, def2{2.0, 5};
     decimal constr_from_int1{"245.56", 2};
     decimal constr_from_int2{123};
