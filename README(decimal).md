@@ -1,61 +1,96 @@
-# ODBC SQL-Types
-ODBC Data Types for SQL
-
-Decimal Type: g80::odbc::decimal
+# Decimal Type
 --
+What's a decimal class (g80::odbc::decimal)? 
 
-What's a decimal? As compared to floating point precisions, 
-a decimal has a fixed decimal places called a scale.
-Useful for currency and accounting where you exactly need 2 decimal places for book keeping (scale of 2)
+A C++ data type intended to handle SQL decimal types.
+Compared with floating-point precisions, a decimal has a fixed decimal places called a scale.
+Useful for currency and accounting where you exactly need 2 decimal places for book keeping (scale of 2).
 
 Parts of a decimal number
 --
-
-|<- precision ->|
-12345678.99999999
-            ^ scale
-
-This class ranges from {-2^64 to 2^64-1} / scale_mul
-where scale: 0  = No decimal, scale_mul = 1
-             1  = 1 decimal place, scale_mul = 10
-             2  = 2 decimal places, scale_mul = 100
-             3  = 3 decimal places, scale_mul = 1000
-             .  = .
-             n  = n decimal places, scale_mul = 10^n
-
-
-Constructors:
---
-Note: No move constructors since the class only uses primitive types
 ```c++
-decimal();                                      // Defines a blank constructor, with a scale of 2 
-                                                // decimal places (default)
+/*
+    |<- precision ->|
+    12345678.99999999
+                ^ scale
 
-template<typename T>                            // Defines a decimal from an integral or 
-requires std::is_integral_v<T> ||               // floating-point types
-std::is_floating_point_v<T>
-decimal(const T t, const int8_t s = 2)
+    This class ranges from {-2^64 to 2^64-1} / scale_mul
+    where scale: 0  = No decimal, scale_mul = 1
+                1  = 1 decimal place, scale_mul = 10
+                2  = 2 decimal places, scale_mul = 100
+                3  = 3 decimal places, scale_mul = 1000
+                .  = .
+                n  = n decimal places, scale_mul = 10^n
+*/
+```
 
-decimal(const std::wstring &n,                  // Defines a decimal from a std::wstring
-const int8_t s = 2)                             // Because Windows ODBC uses wchar_t instead of char
+Available Constructors:
+--
 
-decimal(const decimal &d)                       // Copy constructor
-
-
+```c++
+decimal blank;                              // Equivalent to 0.00, defaults to 2 decimal places
+decimal from_floating_fp {1234.56, 3};      // Equivalent to 1234.560, with 3 decimal places (default is 2)
+decimal from_integral {1234, 3};            // Equivalent to 1234.000, with 3 decimal places (default is 2)
+decimal from_str {L"1234.56", 3}            // Equivalent to 1234.560, with 3 decimal places (default is 2)
+                                            // Note: No move constructor since the class only uses primitive types
 ```
 
 Assignments:
 --
 
 ```c++
-template<typename T>                                // Copy assignment for integral and floating types
-requires std::is_integral_v<T> || 
-std::is_floating_point_v<T>
-auto operator=(const T t) -> decimal &
+decimal assign_from_floating_fp{0, 4}       // Defines a decimal with a scale of 4
+assign_from_floating_fp = {1234.56}         // decimal becomes 1234.5600
+assign_from_floating_fp = {1234.56789}      // decimal becomes 1234.5679
+assign_from_floating_fp = {33}              // decimal becomes 33.0000
+assign_from_floating_fp = {"333.45"}        // decimal becomes 33.4500
+```
 
-auto operator=(const std::wstring &n) -> decimal &  // Copy assignment for wstring types
+Arithmetic:
+--
+```c++
+/*
+    Supports the following basic arithmetic operations
+    (as of this writing - 2022-08-30)
 
-auto operator=(const decimal &d) -> decimal &       // Copy assignment for decimal types
+    +=, -=, *=, /=, +, -, *, /
 
+*/
+```
+
+Equality Operations:
+--
+```c++
+/*
+    Supports the following basic arithmetic operations
+    (as of this writing - 2022-08-30)
+
+    ==, !=, >, >=, <, <=
+
+*/
+```
+
+Stream Operations:
+--
+```c++
+/*
+    Supports the following basic arithmetic operations
+    (as of this writing - 2022-08-30)
+
+    <<, >>
+
+*/
+```
+
+Helpers:
+--
+```c++
+
+ auto get_data() const -> int64_t;
+ auto get_whole() const -> int64_t;
+ auto get_part() const -> int64_t;
+ auto get_scale() const -> int8_t;
+ auto get_scale_mul() const -> int64_t;
+ auto get_as_ldouble() const -> long double;
 
 ```
