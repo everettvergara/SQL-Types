@@ -37,7 +37,7 @@ namespace g80 {
                 return m;
             }
 
-            auto scaled_str_to_ld(const std::string &n) -> long double {
+            auto scaled_str_to_ld(const std::string &n) const -> long double {
                 auto ld = std::stold(n) * scale_mul_;
                 ld += ld >= 0 ? 0.50 : -0.5;
                 return ld;
@@ -89,6 +89,12 @@ namespace g80 {
                 scale_ = d.scale_;
                 scale_mul_ = d.scale_mul_;
                 data_ = d.data_;
+                return *this;
+            }
+
+            // Copy assignment for decimal
+            auto operator=(const std::string &n) -> decimal & {
+                data_ = {static_cast<int64_t>(scaled_str_to_ld(n))};
                 return *this;
             }
 

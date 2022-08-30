@@ -12,7 +12,8 @@ auto main() -> int {
     decimal constr_from_fp2{123.456f};
     decimal constr_from_dec(constr_from_fp1);
     
-    def += "-555.555";
+    // def = 2.0;
+    def = "-555.555";
     def2 = def; // decimal{100.36, 2}; 
 
     std::cout << constr_from_int1.get_as_ldouble() << "\n";
@@ -20,6 +21,7 @@ auto main() -> int {
     std::cout << constr_from_fp1.get_as_ldouble() << "\n";
     std::cout << constr_from_fp2.get_as_ldouble() << "\n";
     std::cout << constr_from_dec.get_as_ldouble() << "\n";
-    std::cout << "def2: " << def.get_as_ldouble() << "\n";
+    std::cout << "def2: " << def.get_whole() << "\n";
+    std::cout << "def2: " << def.get_part() << "\n";
     
 }
