@@ -37,7 +37,11 @@ namespace g80 {
                 return m;
             }
 
-
+            auto scaled_str_to_ld(const std::string &n) -> long double {
+                auto ld = std::stold(n) * scale_mul_;
+                ld += ld >= 0 ? 0.50 : -0.5;
+                return ld;
+            }
 
         public:
 
@@ -60,7 +64,7 @@ namespace g80 {
             decimal(const std::string &n, const int8_t s = 2) : 
                 scale_{s}, 
                 scale_mul_{get_scale_mul(scale_)}, 
-                data_{static_cast<int64_t>(std::stold(n) * scale_mul_ + (std::stold(n) >= 0 ? 0.5 : -0.5))} {
+                data_{static_cast<int64_t>(scaled_str_to_ld(n))} {
             }
 
             // Copy Constructor for decimal
@@ -106,7 +110,7 @@ namespace g80 {
 
             // operator += for string
             auto operator+=(const std::string &n) -> decimal & {
-                data_ = data_ + static_cast<int64_t>((std::stold(n) * scale_mul_ + (std::stold(n) >= 0 ? 0.5 : -0.5)));
+                data_ = data_ + static_cast<int64_t>(scaled_str_to_ld(n));
                 return *this;
             }
 
