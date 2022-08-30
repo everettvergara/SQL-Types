@@ -9,7 +9,7 @@ auto main() -> int {
     decimal d1{0, 4};
     
     auto d2 = 10.0f + d1;
-    std::cout << d2.get_as_ldouble() << "\n";
+    std::cout << "Hello: " << d2 << "\n";
 
     return 0;
 

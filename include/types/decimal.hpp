@@ -173,6 +173,8 @@ namespace g80 {
                 return *this;
             }
 
+            // for output stream
+
             // Helpers
             auto get_data() const -> int64_t {
                 return data_;
@@ -234,5 +236,11 @@ namespace g80 {
             l /= r;
             return l;
         }
+
+        auto operator<<(std::ostream &o, const decimal &d) -> std::ostream & {
+            o << d.get_as_ldouble();
+            return o;
+        }
+
     }
 }
