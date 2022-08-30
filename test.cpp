@@ -8,6 +8,9 @@ auto main() -> int {
 
     decimal d1{0, 4};
     
+    std::cout << "Input number: ";
+    std::cin >> d1;
+
     auto d2 = 10.0f + d1;
     std::cout << "Hello: " << d2 << "\n";
 

@@ -242,5 +242,11 @@ namespace g80 {
             return o;
         }
 
+        auto operator>>(std::istream &i, decimal &d) -> std::istream & {
+            long double ld;
+            i >> ld;
+            d = ld;
+            return i;
+        }
     }
 }
