@@ -154,43 +154,37 @@ namespace g80 {
             // operator *= for integral and fp
             template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
             auto operator*=(const T t) -> decimal & {
-                data_ *= static_cast<int64_t>(t * scale_mul_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
+                data_ = static_cast<int64_t>(t * data_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
                 return *this;
             }
 
             // operator *= for string
             auto operator*=(const std::string &n) -> decimal & {
-                data_ *= static_cast<int64_t>(scaled_str_to_ld(n));
+               
+                //std::cout << "stold: " << static_cast<int64_t>(std::stold(n)) << " _ " << std::stold(n) << " x " << data_ << "\n";
+                auto ld = std::stold(n);
+                data_ = static_cast<int64_t>(ld * data_ + (ld >= 0 ? 0.5 : -0.5));
                 return *this;
             }
 
-            // operator /= for decimal
-            auto operator/=(const decimal &d) -> decimal & {
-                auto gs = scale_ >= d.scale_ ? scale_ : d.scale_;
-                scale_ = gs;
-                scale_mul_ = get_scale_mul(gs);
-                data_ = this->data_on_scale(gs) / d.data_on_scale(gs);
-                return *this;
-            }
-
-            // operator /= for integral and fp
-            template<typename T> requires std::is_integral<T>::value || std::is_floating_point<T>::value
-            auto operator/=(const T t) -> decimal & {
-                data_ /= static_cast<int64_t>(t * scale_mul_ + (std::is_integral<T>::value ? 0 : (t >= 0 ? 0.5 : -0.5)));
-                return *this;
-            }
-
-            // operator /= for string
-            auto operator/=(const std::string &n) -> decimal & {
-                data_ /= static_cast<int64_t>(scaled_str_to_ld(n));
-                return *this;
-            }
 
             // Helpers
+            auto get_data() const -> int64_t {
+                return data_;
+            }
+
             auto get_whole() const -> int64_t {
                 return data_ / scale_mul_;
             }
-            
+
+            auto get_scale() const -> int8_t {
+                return scale_;
+            }
+
+            auto get_scale_mul() const -> int64_t {
+                return scale_mul_;
+            }
+
             auto get_part() const -> int64_t {
                 return data_ % scale_mul_;
             }
