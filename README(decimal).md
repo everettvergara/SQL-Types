@@ -6,7 +6,7 @@ Decimal Type: g80::odbc::decimal
 
 What's a decimal? As compared to floating point precisions, 
 a decimal has a fixed decimal places called a scale.
-Useful for currency and accounting.
+Useful for currency and accounting where you exactly need 2 decimal places for book keeping (scale of 2)
 
 Parts of a decimal number
 --
@@ -26,8 +26,9 @@ where scale: 0  = No decimal, scale_mul = 1
 
 Constructors:
 --
-
-decimal blank;                                  // Defines a blank constructor, with a scale of 2 
+Note: No move constructors since the class only uses primitive types
+```c++
+decimal();                                      // Defines a blank constructor, with a scale of 2 
                                                 // decimal places (default)
 
 template<typename T>                            // Defines a decimal from an integral or 
@@ -40,16 +41,21 @@ const int8_t s = 2)                             // Because Windows ODBC uses wch
 
 decimal(const decimal &d)                       // Copy constructor
 
-template<typename T>                            // Copy assignment for integral and floating types
+
+```
+
+Assignments:
+--
+
+```c++
+template<typename T>                                // Copy assignment for integral and floating types
 requires std::is_integral_v<T> || 
 std::is_floating_point_v<T>
 auto operator=(const T t) -> decimal &
 
-template<typename T>                            // Copy assignment for integral and floating types
-requires std::is_integral_v<T> || 
-std::is_floating_point_v<T>
-auto operator=(const T t) -> decimal &
+auto operator=(const std::wstring &n) -> decimal &  // Copy assignment for wstring types
 
-auto operator=(const decimal &d) -> decimal &   // Copy assignment for decimal types
+auto operator=(const decimal &d) -> decimal &       // Copy assignment for decimal types
 
-auto operator=(const std::wstring &n)           // Copy assignment for wstring types
+
+```

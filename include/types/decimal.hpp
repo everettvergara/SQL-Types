@@ -173,7 +173,35 @@ namespace g80 {
                 return *this;
             }
 
-            // for output stream
+            friend auto operator==(const decimal &l, const decimal &r) -> bool {
+                auto gs = l.scale_ >= r.scale_ ? l.scale_ : r.scale_;
+                return l.data_on_scale(gs) == r.data_on_scale(gs);
+            }
+
+            friend auto operator!=(const decimal &l, const decimal &r) -> bool {
+                auto gs = l.scale_ >= r.scale_ ? l.scale_ : r.scale_;
+                return l.data_on_scale(gs) != r.data_on_scale(gs);
+            }
+
+            friend auto operator>(const decimal &l, const decimal &r) -> bool {
+                auto gs = l.scale_ >= r.scale_ ? l.scale_ : r.scale_;
+                return l.data_on_scale(gs) > r.data_on_scale(gs);
+            }
+
+            friend auto operator>=(const decimal &l, const decimal &r) -> bool {
+                auto gs = l.scale_ >= r.scale_ ? l.scale_ : r.scale_;
+                return l.data_on_scale(gs) >= r.data_on_scale(gs);
+            }
+
+            friend auto operator<(const decimal &l, const decimal &r) -> bool {
+                auto gs = l.scale_ >= r.scale_ ? l.scale_ : r.scale_;
+                return l.data_on_scale(gs) < r.data_on_scale(gs);
+            }
+
+            friend auto operator<=(const decimal &l, const decimal &r) -> bool {
+                auto gs = l.scale_ >= r.scale_ ? l.scale_ : r.scale_;
+                return l.data_on_scale(gs) <= r.data_on_scale(gs);
+            }
 
             // Helpers
             auto get_data() const -> int64_t {
